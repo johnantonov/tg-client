@@ -7,21 +7,26 @@ const patterns = [/Розыгрыш/i, /выиграй/i, /приз/i, /розы
 const chat = '3x (2x)'
 
 async function checkMessagesInChannel(channelId: string, destinationChatId?: bigInt.BigInteger) {
+  const chatId = await getChatIdByName(chat)
+  if (!chatId) return
+  const chatEntity = await client.getEntity(chatId); 
   const messages = await client.getMessages(channelId, { limit: 1000 });
 
-  messages.forEach(message => {
+  for (let i = 0; i < messages.length; i++) {
+    const message = messages[i]
     const msg = message.message;
     const msgDate = message.date
 
     if (isWithinLast30Days(msgDate)) {
       if (patterns.some(pattern => pattern.test(msg))) {
         console.log(JSON.stringify(message))
-        console.log(`Found matching message in channel ${channelId}: ${msg}`);
-      
-        // client.sendMessage(destinationChatId, { message: `Matching message from channel ${channelId}: ${msg}` });
+        await client.forwardMessages(chatEntity, {
+          messages: message.id,
+          fromPeer: channelId,
+        });
       }
     }
-  });
+  }
 }
 
 (async () => {
