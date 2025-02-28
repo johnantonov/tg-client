@@ -15,6 +15,7 @@ async function checkMessagesInChannel(channelId: string, destinationChatId?: big
 
     if (isWithinLast30Days(msgDate)) {
       if (patterns.some(pattern => pattern.test(msg))) {
+        console.log(JSON.stringify(message))
         console.log(`Found matching message in channel ${channelId}: ${msg}`);
       
         // client.sendMessage(destinationChatId, { message: `Matching message from channel ${channelId}: ${msg}` });
