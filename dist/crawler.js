@@ -10,39 +10,42 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("./client");
+const utils_1 = require("./utils");
+const methods_1 = require("./methods");
 const input = require('input');
-const patterns = [/Розыгрыш/i, /выиграй/i, /приз/i];
-function checkMessagesInChannel(channelId) {
+const patterns = [/Розыгрыш/i, /выиграй/i, /приз/i, /розыгрыша/i];
+const chat = '3x (2x)';
+function checkMessagesInChannel(channelId, destinationChatId) {
     return __awaiter(this, void 0, void 0, function* () {
         const messages = yield client_1.client.getMessages(channelId, { limit: 100 });
-        const users = [];
         messages.forEach(message => {
-            var _a;
             const msg = message.message;
-            try {
-                const user = (_a = msg === null || msg === void 0 ? void 0 : msg.split('@')[1]) === null || _a === void 0 ? void 0 : _a.split(" ")[0];
-                users.push(user);
+            const msgDate = message.date;
+            if ((0, utils_1.isWithinLast30Days)(msgDate)) {
+                if (patterns.some(pattern => pattern.test(msg))) {
+                    console.log(`Found matching message in channel ${channelId}: ${msg}`);
+                    client_1.client.sendMessage(destinationChatId, { message: `Matching message from channel ${channelId}: ${msg}` });
+                }
             }
-            catch (_b) {
-            }
-            // if (patterns.some(pattern => pattern.test(message.message))) {
-            //   console.log(`Found matching message in channel ${channelId}: ${message.message}`);
-            // }
         });
-        console.log(users);
     });
 }
 (() => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield client_1.client.start({
-            phoneNumber: () => __awaiter(void 0, void 0, void 0, function* () { return yield input.text("number ?"); }),
-            password: () => __awaiter(void 0, void 0, void 0, function* () { return yield input.text("password?"); }),
-            phoneCode: () => __awaiter(void 0, void 0, void 0, function* () { return yield input.text("Code ?"); }),
-            onError: (err) => console.log(err),
+            phoneNumber: () => __awaiter(void 0, void 0, void 0, function* () { return yield input.text('Enter your phone number:'); }),
+            password: () => __awaiter(void 0, void 0, void 0, function* () { return yield input.text('Enter your password (if applicable):'); }),
+            phoneCode: () => __awaiter(void 0, void 0, void 0, function* () { return yield input.text('Enter the code sent to your phone:'); }),
+            onError: (err) => console.log('Error:', err),
         });
-        checkMessagesInChannel('cashmbozon');
+        console.log('Client started successfully!');
+        const chatId = yield (0, methods_1.getChatIdByName)(chat);
+        console.log(chatId);
+        if (chatId) {
+            yield checkMessagesInChannel('Wylsared', chatId);
+        }
     }
     catch (err) {
-        console.error('Произошла ошибка:', err);
+        console.error('An error occurred:', err);
     }
 }))();
