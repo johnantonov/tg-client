@@ -1,38 +1,47 @@
-import { client } from "./client";
+import { client } from './client';
+import { isWithinLast30Days } from './utils';
+import { getChatIdByName } from './methods';
 const input = require('input'); 
 
-const patterns = [/Розыгрыш/i, /выиграй/i, /приз/i];
+const patterns = [/Розыгрыш/i, /выиграй/i, /приз/i, /розыгрыша/i];
+const chat = '3x (2x)'
 
-async function checkMessagesInChannel(channelId: string) {
-  const messages = await client.getMessages(channelId, { limit: 100 })
-  const users: string[] = [];
+async function checkMessagesInChannel(channelId: string, destinationChatId: bigInt.BigInteger) {
+  const messages = await client.getMessages(channelId, { limit: 100 });
+
   messages.forEach(message => {
-    const msg = message.message
-    try {
-      const user = msg?.split('@')[1]?.split(" ")[0]
-      users.push(user)
-    } catch {
+    const msg = message.message;
+    const msgDate = message.date
 
+    if (isWithinLast30Days(msgDate)) {
+      if (patterns.some(pattern => pattern.test(msg))) {
+        console.log(`Found matching message in channel ${channelId}: ${msg}`);
+      
+        client.sendMessage(destinationChatId, { message: `Matching message from channel ${channelId}: ${msg}` });
+      }
     }
-    // if (patterns.some(pattern => pattern.test(message.message))) {
-    //   console.log(`Found matching message in channel ${channelId}: ${message.message}`);
-    // }
   });
-
-  console.log(users)
 }
 
 (async () => {
   try {
     await client.start({
-      phoneNumber: async () => await input.text("number ?"),
-      password: async () => await input.text("password?"),
-      phoneCode: async () => await input.text("Code ?"),
-      onError: (err) => console.log(err),
+      phoneNumber: async () => await input.text('Enter your phone number:'),
+      password: async () => await input.text('Enter your password (if applicable):'),
+      phoneCode: async () => await input.text('Enter the code sent to your phone:'),
+      onError: (err) => console.log('Error:', err),
     });
+
+    console.log('Client started successfully!');
     
-    checkMessagesInChannel('cashmbozon')
+    const chatId = await getChatIdByName(chat);
+    console.log(chatId)
+
+    if (chatId) {
+      await checkMessagesInChannel('Wylsared', chatId);
+    }
+
   } catch (err) {
-    console.error('Произошла ошибка:', err);
+    console.error('An error occurred:', err);
   }
 })();
