@@ -1,13 +1,30 @@
-// import dotenv from 'dotenv';
 import { TelegramClient } from 'telegram';
 import { StringSession } from 'telegram/sessions';
+import * as fs from 'fs';
 import { config } from './data/config';
+const input = require('input');
 
-// dotenv.config();
+const SESSION_FILE = './session.txt';
 
-// const API_ID = process.env.API_ID;
-// const API_HASH = process.env.API_HASH;
+let sessionString = '';
+if (fs.existsSync(SESSION_FILE)) {
+  sessionString = fs.readFileSync(SESSION_FILE, 'utf8');
+}
 
-export const client = new TelegramClient(new StringSession(''), config.API_ID, config.API_HASH, {
+const stringSession = new StringSession(sessionString);
+export const client = new TelegramClient(stringSession, config.API_ID, config.API_HASH, {
   connectionRetries: config.connectionRetries,
 });
+
+export async function startClient() {
+  await client.start({
+    phoneNumber: async () => await input.text('Enter your phone number:'),
+    password: async () => await input.text('Enter your password (if applicable):'),
+    phoneCode: async () => await input.text('Enter the code sent to your phone:'),
+    onError: (err) => console.log('Error:', err),
+  });
+
+  console.log('Client started successfully!');
+
+  fs.writeFileSync(SESSION_FILE, stringSession.save());
+}
