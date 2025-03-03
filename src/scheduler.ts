@@ -18,6 +18,7 @@ async function updateChannels() {
       for (const channel of cachedChannels) {
         await checkMessagesInChannel(channel, config.destChatId, 1);
       }
+      console.log('Succesfully crawled all channels');
     } else {
       const newChannels = currentChannels.filter(ch => !cachedChannels.includes(ch));
       const oldChannels = currentChannels.filter(ch => cachedChannels.includes(ch));
