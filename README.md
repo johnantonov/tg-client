@@ -1,4 +1,5 @@
 docker build -t tg_parser .
+
 docker run -it -v $(pwd)/session.txt:/app/session.txt tg_parser
 
 
