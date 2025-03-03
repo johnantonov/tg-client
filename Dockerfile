@@ -9,6 +9,6 @@ COPY . .
 
 RUN npx tsc
 
-VOLUME ["/app/session"]
+VOLUME ["/app/session.txt"]
 
 CMD ["node", "dist/scheduler.js"]
