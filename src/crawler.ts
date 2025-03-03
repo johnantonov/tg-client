@@ -5,8 +5,8 @@ import { config } from './data/config';
 import { getChatIdByName } from './methods';
 
 export async function checkMessagesInChannel(channelId: string, destinationChatId: number, days: number) {
-  const messages = await client.getMessages(channelId, { limit: 1000 });
-
+  // const messages = await client.getMessages(channelId, { limit: 1000 });
+  const messages: any[] = [];
 
   console.log('start getting dest chat id')
   const chatId = await getChatIdByName(config.destChatName)
