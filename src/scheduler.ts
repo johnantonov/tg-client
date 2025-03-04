@@ -7,7 +7,7 @@ import { sleep } from './utils';
 
 let cachedChannels: string[] = [];
 
-async function updateChannels() {
+async function parseChannels() {
   console.log(`[${new Date().toISOString()}] Start updating channels...`);
 
   try {
@@ -17,7 +17,7 @@ async function updateChannels() {
       console.log('First start: cashing channels and crawling by 1 day');
       cachedChannels = currentChannels;
       for (const channel of cachedChannels) {
-        sleep(30000)
+        await sleep(30000)
         await checkMessagesInChannel(channel, 0);
       }
       console.log('Succesfully crawled all channels');
@@ -30,12 +30,12 @@ async function updateChannels() {
       cachedChannels = currentChannels;
 
       for (const channel of newChannels) {
-        sleep(30000)
+        await sleep(30000)
         await checkMessagesInChannel(channel, 30);
       }
 
       for (const channel of oldChannels) {
-        sleep(30000)
+        await sleep(30000)
         await checkMessagesInChannel(channel, 1);
       }
     }
@@ -46,9 +46,9 @@ async function updateChannels() {
 
 async function startScheduler() {
   await startClient();
-  await updateChannels();
+  await parseChannels();
 
-  cron.schedule('0 3 * * *', updateChannels, {
+  cron.schedule('0 3 * * *', parseChannels, {
     timezone: 'UTC',
   });
 }

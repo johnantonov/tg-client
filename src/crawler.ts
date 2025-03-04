@@ -1,5 +1,5 @@
 import { client } from './client';
-import { isWithinLastXDays } from './utils';
+import { isWithinLastXDays, sleep } from './utils';
 import { giftPatterns } from './data/patterns';
 import { Api } from 'telegram';
 import bigInt from "big-integer";
@@ -12,21 +12,15 @@ const cachedChatEntity = new Api.InputPeerChannel({
 export async function checkMessagesInChannel(channelId: string, days: number) {
   const messages = await client.getMessages(channelId, { limit: 100 });
 
-  // if (!cachedChatEntity) {
-  //   cachedChatEntity = await client.getEntity(config.destChatId); 
-  //   console.log('Chat entity cached:', cachedChatEntity);
-  // }
-
-  console.log(channelId)
-
   for (let message of messages) {
     if (isWithinLastXDays(days, message.date)) {
       if (giftPatterns.some(pattern => pattern.test(message.message))) {
-        // console.log(JSON.stringify(message));
         try {
+          await sleep(30000); 
+          
           await client.forwardMessages(cachedChatEntity, {
             messages: message.id,
-            fromPeer: channelId,
+            fromPeer: message.peerId,
           });
         } catch (e) {
           console.error(e);
