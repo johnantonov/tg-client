@@ -20,7 +20,7 @@ export async function checkMessagesInChannel(channelData: any, days: number) {
       console.error('Username is missing, cannot resolve chatId');
       return;
     }
-
+    
     try {
       const entity = await client.getEntity(chatUsername);
       

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { config } from "./data/config";
 
-export async function getChannels(): Promise<{ chatId: string, accessHash: string | null, chatUsername: string, lastChecked: string | null }[]> {
+export async function getChannels(): Promise<{ chatId: string | null, accessHash: string | null, chatUsername: string, lastChecked: string | null }[]> {
   const res = await axios.get(config.WEB_APP_URL);
   if (res) {
     return res.data;

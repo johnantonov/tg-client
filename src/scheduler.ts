@@ -4,7 +4,7 @@ import { checkMessagesInChannel } from './crawler';
 import { startClient } from './client';
 import { sleep } from './utils';
 
-let cachedChannels: { chatId: string,  chatUsername: string, accessHash: string | null, lastChecked: string | null }[] = [];
+let cachedChannels: { chatId: string | null,  chatUsername: string, accessHash: string | null, lastChecked: string | null }[] = [];
 
 async function parseChannels() {
   console.log(`[${new Date().toISOString()}] Start updating channels...`);
@@ -23,8 +23,8 @@ async function parseChannels() {
       }
       console.log('Successfully crawled all channels');
     } else {
-      const newChannels = currentChannels.filter(ch => !cachedChannels.find(cached => cached.chatId === ch.chatId));
-      const oldChannels = currentChannels.filter(ch => cachedChannels.find(cached => cached.chatId === ch.chatId));
+      const newChannels = currentChannels.filter(ch => !cachedChannels.find(cached => cached.chatUsername === ch.chatUsername));
+      const oldChannels = currentChannels.filter(ch => cachedChannels.find(cached => cached.chatUsername === ch.chatUsername));
 
       console.log(`Found ${newChannels.length} new channels, ${oldChannels.length} old channels.`);
 
