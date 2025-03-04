@@ -1,7 +1,7 @@
 import axios from "axios";
 import { config } from "./data/config";
 
-export async function getChannels(): Promise<{ chatId: string, accessHash: string | null, lastChecked: string | null }[]> {
+export async function getChannels(): Promise<{ chatId: string, accessHash: string | null, chatUsername: string, lastChecked: string | null }[]> {
   const res = await axios.get(config.WEB_APP_URL);
   if (res) {
     return res.data;
@@ -9,7 +9,7 @@ export async function getChannels(): Promise<{ chatId: string, accessHash: strin
   return [];
 };
 
-export async function updateChannelInfo(channels: { chatId: string, accessHash: any, lastChecked: string }[]) {
+export async function updateChannelInfo(channels: { chatId: string, accessHash: any, chatUsername: string, lastChecked: string }[]) {
   try {
     await axios.post(config.WEB_APP_URL, channels);
   } catch (error) {

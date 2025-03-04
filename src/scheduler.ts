@@ -4,7 +4,7 @@ import { checkMessagesInChannel } from './crawler';
 import { startClient } from './client';
 import { sleep } from './utils';
 
-let cachedChannels: { chatId: string, accessHash: string | null, lastChecked: string | null }[] = [];
+let cachedChannels: { chatId: string,  chatUsername: string, accessHash: string | null, lastChecked: string | null }[] = [];
 
 async function parseChannels() {
   console.log(`[${new Date().toISOString()}] Start updating channels...`);
