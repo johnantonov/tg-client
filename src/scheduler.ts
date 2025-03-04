@@ -16,7 +16,7 @@ async function updateChannels() {
       console.log('First start: cashing channels and crawling by 1 day');
       cachedChannels = currentChannels;
       for (const channel of cachedChannels) {
-        await checkMessagesInChannel(channel, config.destChatId, 1);
+        await checkMessagesInChannel(channel, 0);
       }
       console.log('Succesfully crawled all channels');
     } else {
@@ -28,11 +28,11 @@ async function updateChannels() {
       cachedChannels = currentChannels;
 
       for (const channel of newChannels) {
-        await checkMessagesInChannel(channel, config.destChatId, 30);
+        await checkMessagesInChannel(channel, 30);
       }
 
       for (const channel of oldChannels) {
-        await checkMessagesInChannel(channel, config.destChatId, 1);
+        await checkMessagesInChannel(channel, 1);
       }
     }
   } catch (err) {
