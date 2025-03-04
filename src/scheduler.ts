@@ -3,6 +3,7 @@ import { getChannels } from './db_utils';
 import { checkMessagesInChannel } from './crawler';
 import { config } from './data/config';
 import { startClient } from './client';
+import { sleep } from './utils';
 
 let cachedChannels: string[] = [];
 
@@ -16,6 +17,7 @@ async function updateChannels() {
       console.log('First start: cashing channels and crawling by 1 day');
       cachedChannels = currentChannels;
       for (const channel of cachedChannels) {
+        sleep(30000)
         await checkMessagesInChannel(channel, 0);
       }
       console.log('Succesfully crawled all channels');
@@ -28,10 +30,12 @@ async function updateChannels() {
       cachedChannels = currentChannels;
 
       for (const channel of newChannels) {
+        sleep(30000)
         await checkMessagesInChannel(channel, 30);
       }
 
       for (const channel of oldChannels) {
+        sleep(30000)
         await checkMessagesInChannel(channel, 1);
       }
     }

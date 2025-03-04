@@ -6,3 +6,7 @@ export function isWithinLastXDays(days: number, date: Api.Message['date']): bool
   const messageDate = new Date(date * 1000);
   return messageDate > thirtyDaysAgo;
 }
+
+export function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}

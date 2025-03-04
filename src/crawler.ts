@@ -1,17 +1,21 @@
 import { client } from './client';
 import { isWithinLastXDays } from './utils';
 import { giftPatterns } from './data/patterns';
-import { config } from './data/config';
+import { Api } from 'telegram';
+import bigInt from "big-integer";
 
-let cachedChatEntity: any = null;
+const cachedChatEntity = new Api.InputPeerChannel({
+  channelId: bigInt(2257400192),
+  accessHash: bigInt(-8056487850660300),
+});
 
 export async function checkMessagesInChannel(channelId: string, days: number) {
   const messages = await client.getMessages(channelId, { limit: 100 });
 
-  if (!cachedChatEntity) {
-    cachedChatEntity = await client.getEntity(config.destChatId); 
-    console.log('Chat entity cached:', cachedChatEntity);
-  }
+  // if (!cachedChatEntity) {
+  //   cachedChatEntity = await client.getEntity(config.destChatId); 
+  //   console.log('Chat entity cached:', cachedChatEntity);
+  // }
 
   console.log(channelId)
 
