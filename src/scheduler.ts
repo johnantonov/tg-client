@@ -18,7 +18,7 @@ async function parseChannels() {
 
       for (const channel of cachedChannels) {
         const daysToCheck = channel.accessHash ? 1 : 30;
-        await checkMessagesInChannel(channel.chatId, daysToCheck, channel.accessHash);
+        await checkMessagesInChannel(channel, daysToCheck);
         await sleep(30000);
       }
       console.log('Successfully crawled all channels');
@@ -31,12 +31,12 @@ async function parseChannels() {
       cachedChannels = currentChannels;
 
       for (const channel of newChannels) {
-        await checkMessagesInChannel(channel.chatId, 30, channel.accessHash);
+        await checkMessagesInChannel(channel, 30);
         await sleep(30000);
       }
 
       for (const channel of oldChannels) {
-        await checkMessagesInChannel(channel.chatId, 1, channel.accessHash);
+        await checkMessagesInChannel(channel, 1);
         await sleep(30000);
       }
     }
