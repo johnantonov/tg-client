@@ -4,7 +4,7 @@ import { checkMessagesInChannel } from './crawler';
 import { startClient } from './client';
 import { sleep } from './utils';
 
-let cachedChannels: string[] = [];
+let cachedChannels: { chatId: string, accessHash: string | null, lastChecked: string | null }[] = [];
 
 async function parseChannels() {
   console.log(`[${new Date().toISOString()}] Start updating channels...`);
@@ -13,29 +13,31 @@ async function parseChannels() {
     const currentChannels = await getChannels();
 
     if (cachedChannels.length === 0) {
-      console.log('First start: cashing channels and crawling by 1 day');
+      console.log('First start: caching channels and crawling by 30 days if accessHash is missing');
       cachedChannels = currentChannels;
+
       for (const channel of cachedChannels) {
-        await sleep(30000)
-        await checkMessagesInChannel(channel, 0);
+        const daysToCheck = channel.accessHash ? 1 : 30;
+        await checkMessagesInChannel(channel.chatId, daysToCheck, channel.accessHash);
+        await sleep(30000);
       }
-      console.log('Succesfully crawled all channels');
+      console.log('Successfully crawled all channels');
     } else {
-      const newChannels = currentChannels.filter(ch => !cachedChannels.includes(ch));
-      const oldChannels = currentChannels.filter(ch => cachedChannels.includes(ch));
+      const newChannels = currentChannels.filter(ch => !cachedChannels.find(cached => cached.chatId === ch.chatId));
+      const oldChannels = currentChannels.filter(ch => cachedChannels.find(cached => cached.chatId === ch.chatId));
 
       console.log(`Found ${newChannels.length} new channels, ${oldChannels.length} old channels.`);
 
       cachedChannels = currentChannels;
 
       for (const channel of newChannels) {
-        await sleep(30000)
-        await checkMessagesInChannel(channel, 30);
+        await checkMessagesInChannel(channel.chatId, 30, channel.accessHash);
+        await sleep(30000);
       }
 
       for (const channel of oldChannels) {
-        await sleep(30000)
-        await checkMessagesInChannel(channel, 1);
+        await checkMessagesInChannel(channel.chatId, 1, channel.accessHash);
+        await sleep(30000);
       }
     }
   } catch (err) {
