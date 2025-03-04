@@ -1,7 +1,6 @@
 import cron from 'node-cron';
 import { getChannels } from './db_utils';
 import { checkMessagesInChannel } from './crawler';
-import { config } from './data/config';
 import { startClient } from './client';
 import { sleep } from './utils';
 
