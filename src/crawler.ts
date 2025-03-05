@@ -1,6 +1,6 @@
 import { client } from './client';
 import { isWithinLastXDays, sleep } from './utils';
-import { giftPatterns } from './data/patterns';
+import { giftPatterns, antiGiftPatterns } from './data/patterns';  
 import { Api } from 'telegram';
 import bigInt from "big-integer";
 import { updateChannelInfo, getChannels } from './db_utils';
@@ -52,14 +52,23 @@ export async function checkMessagesInChannel(channelData: any, days: number) {
 
   await sleep({ random: true });
   console.log('Start getting messages');
+  const inputPeerChannel = new Api.InputPeerChannel({
+    channelId: bigInt(chatId),
+    accessHash: bigInt(accessHash) 
+  });
   
   try {
-    const messages = await client.getMessages(chatId, { limit: 100 });
+    const messages = await client.getMessages(inputPeerChannel, { limit: 100 });
     const targetMessages = [];
     let peerId = null;
 
     for (let message of messages) {
       if (isWithinLastXDays(days, message.date)) {
+        if (antiGiftPatterns.some(pattern => pattern.test(message.message))) {
+          console.log('Message skipped due to anti-pattern: ' + message.id);
+          continue;
+        }
+
         if (giftPatterns.some(pattern => pattern.test(message.message))) {
           try {
             console.log('Found message ' + message.id);
