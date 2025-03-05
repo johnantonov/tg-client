@@ -19,7 +19,7 @@ async function parseChannels() {
 
       for (const channel of cachedChannels) {
         // const daysToCheck = channel.accessHash ? 0 : 30;
-        const daysToCheck = 0;
+        const daysToCheck = 1;
         await checkMessagesInChannel(channel, daysToCheck);
         await sleep({ random: true });
       }
