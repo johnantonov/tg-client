@@ -7,6 +7,14 @@ export function isWithinLastXDays(days: number, date: Api.Message['date']): bool
   return messageDate > thirtyDaysAgo;
 }
 
-export function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+export function sleep(ms: number | { random: boolean }) {
+  let timeToSleep: number;
+  
+  if (typeof ms === 'object' && ms.random) {
+    timeToSleep = Math.floor(Math.random() * (40000 - 25000 + 1)) + 25000;
+  } else {
+    timeToSleep = ms as number;
+  }
+
+  return new Promise(resolve => setTimeout(resolve, timeToSleep));
 }

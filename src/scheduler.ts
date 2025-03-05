@@ -3,6 +3,7 @@ import { getChannels } from './db_utils';
 import { checkMessagesInChannel } from './crawler';
 import { startClient } from './client';
 import { sleep } from './utils';
+import { FloodWaitError } from 'telegram/errors';
 
 let cachedChannels: { chatId: string | null,  chatUsername: string, accessHash: string | null, lastChecked: string | null }[] = [];
 
@@ -19,7 +20,7 @@ async function parseChannels() {
       for (const channel of cachedChannels) {
         const daysToCheck = channel.accessHash ? 1 : 30;
         await checkMessagesInChannel(channel, daysToCheck);
-        await sleep(30000);
+        await sleep({ random: true });
       }
       console.log('Successfully crawled all channels');
     } else {
@@ -32,16 +33,21 @@ async function parseChannels() {
 
       for (const channel of newChannels) {
         await checkMessagesInChannel(channel, 30);
-        await sleep(30000);
+        await sleep({ random: true });
       }
 
       for (const channel of oldChannels) {
         await checkMessagesInChannel(channel, 1);
-        await sleep(30000);
+        await sleep({ random: true });
       }
     }
   } catch (err) {
-    console.error('Error updating channels:', err);
+    if (err instanceof FloodWaitError) {
+      console.log(`Flood wait error encountered. Waiting for ${err.seconds + 10} seconds.`);
+      await sleep(err.seconds * 1000 + 10000);
+    } else {
+      console.error('Error updating channels:', err);
+    }
   }
 }
 
