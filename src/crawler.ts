@@ -53,9 +53,10 @@ export async function checkMessagesInChannel(channelData: any, days: number) {
   await sleep({ random: true });
   console.log('Start getting messages');
   const inputPeerChannel = new Api.InputPeerChannel({
-    channelId: chatId,
-    accessHash: accessHash
+    channelId: bigInt(chatId),
+    accessHash: bigInt(accessHash.toString())
   });
+  
   
   try {
     const messages = await client.getMessages(inputPeerChannel, { limit: 100 });
