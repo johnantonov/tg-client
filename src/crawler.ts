@@ -53,8 +53,8 @@ export async function checkMessagesInChannel(channelData: any, days: number) {
   await sleep({ random: true });
   console.log('Start getting messages');
   const inputPeerChannel = new Api.InputPeerChannel({
-    channelId: bigInt(chatId),
-    accessHash: bigInt(accessHash) 
+    channelId: chatId,
+    accessHash: accessHash
   });
   
   try {
@@ -87,8 +87,8 @@ export async function checkMessagesInChannel(channelData: any, days: number) {
         messages: targetMessages,
         fromPeer: peerId,
       });
-    }
-    console.log('Successfully forwarded messages: ' + targetMessages);
+      console.log('Successfully forwarded messages: ' + targetMessages);
+    } 
   } catch (e) {
     if (e instanceof FloodWaitError) {
       console.log(`Flood wait error encountered. Waiting for ${e.seconds + 10} seconds.`);
